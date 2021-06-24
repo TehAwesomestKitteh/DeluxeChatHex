@@ -9,14 +9,14 @@ import com.yakovliam.deluxechathex.replacer.SectionReplacer;
 import com.yakovliam.deluxechathex.util.Triple;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.examination.string.MultiLineStringExaminer;
 import org.bukkit.entity.Player;
 
 import java.util.regex.Pattern;
 
-public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implements Builder<Triple<Player, String, Format>, TextComponent> {
+public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implements Builder<Triple<Player, String, Format>, Component> {
 
     /**
      * Ampersand replacer
@@ -27,6 +27,16 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
      * Section replacer
      */
     private static final SectionReplacer SECTION_REPLACER = new SectionReplacer();
+
+    /**
+     * Old hex pattern
+     */
+    private static final Pattern OLD_HEX_PATTERN = Pattern.compile("#[0-9A-Fa-f]{6}");
+
+    /**
+     * New hex pattern
+     */
+    private static final String NEW_HEX_PATTERN = "&$0";
 
     public NormalLiveChatFormatBuilder(DeluxeChatHex plugin) {
         super(plugin);
@@ -39,20 +49,17 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
      * @return The array of baseComponents
      */
     @Override
-    public TextComponent build(Triple<Player, String, Format> input) {
+    public Component build(Triple<Player, String, Format> input) {
         // get input parameters
         Player player = input.getLeft();
         String messageString = input.getCenter();
         Format format = input.getRight();
 
         // create component builder for message
-        ComponentBuilder<TextComponent, TextComponent.Builder> componentBuilder = Component.text();
+        final Component[] componentBuilder = {Component.text("")};
 
         // loop through format parts
         format.getFormatParts().forEach(formatPart -> {
-            // create component builder
-            ComponentBuilder<TextComponent, TextComponent.Builder> partComponentBuilder = Component.text();
-
             String text = formatPart.getText();
 
             // basically what I am doing here is converting & -> section, then replacing placeholders, then section -> &
@@ -60,7 +67,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
             text = SECTION_REPLACER.apply(PlaceholderAPI.setPlaceholders(player, AMPERSAND_REPLACER.apply(text, player)), player);
 
             // replace hex #123456 with &#123456
-            text = text.replaceAll("#[0-9A-Fa-f]{6}", "&$0");
+            text = text.replaceAll(OLD_HEX_PATTERN.pattern(), NEW_HEX_PATTERN);
 
             // build text from legacy (and replace <chat_message> with the actual message)
             // and check permissions for chat colors
@@ -85,17 +92,18 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
                 }
             }
 
-            partComponentBuilder.append(parsedText);
-
-            // append build partComponentBuilder to main componentBuilder
-            componentBuilder.append(partComponentBuilder.build());
+            componentBuilder[0] = componentBuilder[0].append(parsedText);
         });
 
         // replace hex #123456 with &#123456
-        messageString = messageString.replaceAll("#[0-9A-Fa-f]{6}", "&$0");
-        componentBuilder.append(LegacyComponentSerializer.legacyAmpersand().deserialize(messageString));
+        // this adds the chat message on the end of the component builder
+        messageString = messageString.replaceAll(OLD_HEX_PATTERN.pattern(), NEW_HEX_PATTERN);
+        componentBuilder[0] = componentBuilder[0].append(LegacyComponentSerializer.legacyAmpersand().deserialize(messageString));
+
+        // TODO not working, this was a test made by kashike of kyori, and it's being worked on
+        componentBuilder[0].examine(MultiLineStringExaminer.simpleEscaping()).forEach(System.out::println);
 
         // return built component builder
-        return componentBuilder.build();
+        return componentBuilder[0];
     }
 }

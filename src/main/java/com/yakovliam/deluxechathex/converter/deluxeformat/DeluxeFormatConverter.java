@@ -8,6 +8,7 @@ import com.yakovliam.deluxechathex.util.Triple;
 import me.clip.deluxechat.objects.DeluxeFormat;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class DeluxeFormatConverter implements Converter<DeluxeFormat, ChatFormat> {
 
@@ -40,10 +41,19 @@ public class DeluxeFormatConverter implements Converter<DeluxeFormat, ChatFormat
         // chat color
         FormatPart chatColor = new FormatPart(deluxeFormat.getChatColor(), null);
 
+        LinkedList<FormatPart> formatParts = new LinkedList<>();
+
+        formatParts.add(channel);
+        formatParts.add(prefix);
+        formatParts.add(nameColor);
+        formatParts.add(name);
+        formatParts.add(suffix);
+        formatParts.add(chatColor);
+
         // compile into one chat format
         return new ChatFormat(deluxeFormat.getIdentifier(),
                 deluxeFormat.getIndex()
                 , "G7bRYIbhUg",
-                new Format(Arrays.asList(channel, prefix, nameColor, name, suffix, chatColor)));
+                new Format(formatParts));
     }
 }
