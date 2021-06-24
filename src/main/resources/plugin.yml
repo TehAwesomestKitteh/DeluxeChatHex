@@ -1,0 +1,9 @@
+name: DeluxeChatHex
+version: @version@
+main: com.yakovliam.deluxechathex.DeluxeChatHex
+api-version: 1.16
+authors: [ yakovliam ]
+description: DeluxeChat Hex Color Plugin
+website: https://www.yakovliam.com/
+depend:
+  - DeluxeChat
