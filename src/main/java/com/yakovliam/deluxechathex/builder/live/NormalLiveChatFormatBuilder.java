@@ -139,7 +139,9 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
         Component previous = null;
         for (Component current : componentBuilder) {
             if (previous != null) {
-                current = current.mergeStyle(previous, Style.Merge.colorAndDecorations());
+                if (!current.hasStyling() || current.color() == null) {
+                    current = current.mergeStyle(previous, Style.Merge.colorAndDecorations());
+                }
             }
 
             finalComponentBuilder.add(current);
