@@ -12,6 +12,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -141,18 +142,19 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
                 continue;
             }
 
-            if (!current.hasStyling()) {
-                current = current.style(previous.style());
+            if (!current.hasStyling() || current.color() == null) {
+                // current = current.style(previous.style());
+                current = current.mergeStyle(previous, Style.Merge.COLOR, Style.Merge.DECORATIONS);
             }
 
-            if (current.color() == null) {
-                current = current.colorIfAbsent(previous.color());
-                for (Map.Entry<TextDecoration, TextDecoration.State> textDecorationStateEntry : previous.decorations().entrySet()) {
-                    if (!current.hasDecoration(textDecorationStateEntry.getKey())) {
-                        current = current.decoration(textDecorationStateEntry.getKey(), textDecorationStateEntry.getValue());
-                    }
-                }
-            }
+            // if (current.color() == null) {
+            //     current = current.colorIfAbsent(previous.color());
+            //     for (Map.Entry<TextDecoration, TextDecoration.State> textDecorationStateEntry : previous.decorations().entrySet()) {
+            //         if (!current.hasDecoration(textDecorationStateEntry.getKey())) {
+            //             current = current.decoration(textDecorationStateEntry.getKey(), textDecorationStateEntry.getValue());
+            //         }
+            //     }
+            // }
 
             finalComponentBuilder.add(current);
 
