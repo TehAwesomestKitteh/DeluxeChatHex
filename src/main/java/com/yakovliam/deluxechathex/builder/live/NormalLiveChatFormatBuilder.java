@@ -4,16 +4,19 @@ import com.yakovliam.deluxechathex.DeluxeChatHex;
 import com.yakovliam.deluxechathex.builder.Builder;
 import com.yakovliam.deluxechathex.model.formatting.Extra;
 import com.yakovliam.deluxechathex.model.formatting.Format;
+import com.yakovliam.deluxechathex.model.formatting.FormatPart;
 import com.yakovliam.deluxechathex.replacer.AmpersandReplacer;
 import com.yakovliam.deluxechathex.replacer.SectionReplacer;
 import com.yakovliam.deluxechathex.util.Triple;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.examination.string.MultiLineStringExaminer;
 import org.bukkit.entity.Player;
 
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implements Builder<Triple<Player, String, Format>, Component> {
@@ -56,10 +59,10 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
         Format format = input.getRight();
 
         // create component builder for message
-        final Component[] componentBuilder = {Component.text("")};
+        List<Component> componentBuilder = new ArrayList<>();
 
         // loop through format parts
-        format.getFormatParts().forEach(formatPart -> {
+        for (FormatPart formatPart : format.getFormatParts()) {
             String text = formatPart.getText();
 
             // basically what I am doing here is converting & -> section, then replacing placeholders, then section -> &
@@ -92,18 +95,54 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
                 }
             }
 
-            componentBuilder[0] = componentBuilder[0].append(parsedText);
-        });
+            componentBuilder.add(parsedText);
+        }
 
         // replace hex #123456 with &#123456
         // this adds the chat message on the end of the component builder
         messageString = messageString.replaceAll(OLD_HEX_PATTERN.pattern(), NEW_HEX_PATTERN);
-        componentBuilder[0] = componentBuilder[0].append(LegacyComponentSerializer.legacyAmpersand().deserialize(messageString));
+        componentBuilder.add(LegacyComponentSerializer.legacyAmpersand().deserialize(messageString));
 
-        // TODO not working, this was a test made by kashike of kyori, and it's being worked on
-        componentBuilder[0].examine(MultiLineStringExaminer.simpleEscaping()).forEach(System.out::println);
+        List<Component> finalComponentBuilder = mergeStylingLegacy(componentBuilder);
 
         // return built component builder
-        return componentBuilder[0];
+        return LinearComponents.linear(finalComponentBuilder.toArray(Component[]::new));
+    }
+
+    /**
+     * Apply merge styling, legacy
+     * @param componentBuilder component builder
+     * @return final component builder
+     */
+    private List<Component> mergeStylingLegacy(List<Component> componentBuilder) {
+        List<Component> finalComponentBuilder = new ArrayList<>();
+        // for each component in the component builder list, apply the style of the previous to the next (if absent)
+        Component previous = null;
+        for (Component current : componentBuilder) {
+            if (previous == null) {
+                finalComponentBuilder.add(current);
+                previous = current;
+                continue;
+            }
+
+            if (!current.hasStyling()) {
+                current = current.style(previous.style());
+            }
+
+            if (current.color() == null) {
+                current = current.colorIfAbsent(previous.color());
+                for (Map.Entry<TextDecoration, TextDecoration.State> textDecorationStateEntry : previous.decorations().entrySet()) {
+                    if (!current.hasDecoration(textDecorationStateEntry.getKey())) {
+                        current = current.decoration(textDecorationStateEntry.getKey(), textDecorationStateEntry.getValue());
+                    }
+                }
+            }
+
+            finalComponentBuilder.add(current);
+
+            previous = current;
+        }
+
+        return finalComponentBuilder;
     }
 }

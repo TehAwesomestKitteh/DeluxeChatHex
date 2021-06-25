@@ -4,16 +4,19 @@ import com.yakovliam.deluxechathex.builder.live.NormalLiveChatFormatBuilder;
 import com.yakovliam.deluxechathex.converter.deluxeformat.DeluxeFormatConverter;
 import com.yakovliam.deluxechathex.model.formatting.ChatFormat;
 import com.yakovliam.deluxechathex.util.Triple;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.deluxechat.events.DeluxeChatEvent;
 import me.clip.deluxechat.objects.DeluxeFormat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Collections;
 
 public final class DeluxeChatHex extends JavaPlugin implements Listener {
 
@@ -39,7 +42,12 @@ public final class DeluxeChatHex extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
+        event.getRecipients().clear();
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onDeluxeChatEvent(DeluxeChatEvent event) {
         event.setCancelled(true);
 
@@ -56,6 +64,5 @@ public final class DeluxeChatHex extends JavaPlugin implements Listener {
                 .anyMatch(p -> p.getUniqueId().equals(((Player) c).getUniqueId())))
                 .sendMessage(component);
 
-        event.setChatMessage(null);
     }
 }

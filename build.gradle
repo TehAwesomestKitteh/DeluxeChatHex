@@ -40,6 +40,8 @@ shadowJar {
     archiveBaseName.set('DeluxeChatHex-' + version)
     archiveClassifier.set('')
     archiveVersion.set('')
+
+    relocate 'net.kyori', 'com.yakovliam.deluxechathex.lib.kyori'
 }
 
 processResources {
