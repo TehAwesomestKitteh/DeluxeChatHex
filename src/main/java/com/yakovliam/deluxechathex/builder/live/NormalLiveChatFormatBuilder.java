@@ -11,6 +11,7 @@ import com.yakovliam.deluxechathex.util.Triple;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -100,7 +101,22 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
         // replace hex #123456 with &#123456
         // this adds the chat message on the end of the component builder
         messageString = messageString.replaceAll(OLD_HEX_PATTERN.pattern(), NEW_HEX_PATTERN);
-        componentBuilder.add(LegacyComponentSerializer.legacyAmpersand().deserialize(messageString));
+
+        LegacyComponentSerializer.Builder legacyComponentSerializerBuilder = LegacyComponentSerializer.builder();
+
+        if (player.hasPermission("deluxechat.url")) {
+            legacyComponentSerializerBuilder.extractUrls();
+        }
+        if (player.hasPermission("deluxechat.color")) {
+            legacyComponentSerializerBuilder.character('&');
+            legacyComponentSerializerBuilder.hexColors();
+        }
+        if (!player.hasPermission("deluxechat.formatting")) {
+            legacyComponentSerializerBuilder.flattener(ComponentFlattener.basic());
+        }
+
+        componentBuilder.add(legacyComponentSerializerBuilder.build()
+                .deserialize(messageString));
 
         List<Component> finalComponentBuilder = mergeStylingLegacy(componentBuilder);
 
@@ -110,6 +126,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
 
     /**
      * Apply merge styling, legacy
+     *
      * @param componentBuilder component builder
      * @return final component builder
      */
