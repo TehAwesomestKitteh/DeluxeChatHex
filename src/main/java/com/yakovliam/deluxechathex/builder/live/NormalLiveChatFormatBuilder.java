@@ -119,7 +119,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
         componentBuilder.add(legacyComponentSerializerBuilder.build()
                 .deserialize(messageString));
 
-        List<Component> finalComponentBuilder = mergeStylingLegacy(componentBuilder);
+        List<Component> finalComponentBuilder = mergeComponentListStyling(componentBuilder);
 
         // return built component builder
         return LinearComponents.linear(finalComponentBuilder.toArray(Component[]::new));
@@ -127,37 +127,22 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
 
     /**
      * Apply merge styling, legacy
+     * <p>
+     * Merges previous components' style with the next
      *
      * @param componentBuilder component builder
      * @return final component builder
      */
-    private List<Component> mergeStylingLegacy(List<Component> componentBuilder) {
+    private List<Component> mergeComponentListStyling(List<Component> componentBuilder) {
         List<Component> finalComponentBuilder = new ArrayList<>();
         // for each component in the component builder list, apply the style of the previous to the next (if absent)
         Component previous = null;
         for (Component current : componentBuilder) {
-            if (previous == null) {
-                finalComponentBuilder.add(current);
-                previous = current;
-                continue;
+            if (previous != null) {
+                current = current.mergeStyle(previous, Style.Merge.colorAndDecorations());
             }
-
-            if (!current.hasStyling() || current.color() == null) {
-                // current = current.style(previous.style());
-                current = current.mergeStyle(previous, Style.Merge.COLOR, Style.Merge.DECORATIONS);
-            }
-
-            // if (current.color() == null) {
-            //     current = current.colorIfAbsent(previous.color());
-            //     for (Map.Entry<TextDecoration, TextDecoration.State> textDecorationStateEntry : previous.decorations().entrySet()) {
-            //         if (!current.hasDecoration(textDecorationStateEntry.getKey())) {
-            //             current = current.decoration(textDecorationStateEntry.getKey(), textDecorationStateEntry.getValue());
-            //         }
-            //     }
-            // }
 
             finalComponentBuilder.add(current);
-
             previous = current;
         }
 
