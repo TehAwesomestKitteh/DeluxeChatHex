@@ -9,6 +9,7 @@ import me.clip.deluxechat.events.DeluxeChatEvent;
 import me.clip.deluxechat.objects.DeluxeFormat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,6 +33,9 @@ public final class DeluxeChatHex extends JavaPlugin implements Listener {
 
         // Plugin startup logic
         this.getServer().getPluginManager().registerEvents(this, this);
+
+        // initialize metrics
+        new Metrics(this, 11871);
     }
 
     @Override
