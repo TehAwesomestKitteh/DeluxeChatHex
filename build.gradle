@@ -25,14 +25,14 @@ repositories {
         url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
     }
     maven {
-        url = 'https://repo.yakovliam.com/snapshots/'
+        url = 'https://repo.extendedclip.com/content/repositories/public/'
     }
 }
 
 dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.9'
-    compileOnly 'me.clip:deluxechatapi:1.0.0-SNAPSHOT'
+    compileOnly 'me.clip:deluxechat:1.14.4'
     implementation 'net.kyori:adventure-api:4.8.1'
     implementation 'net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT'
     implementation 'org.bstats:bstats-bukkit:2.2.1'

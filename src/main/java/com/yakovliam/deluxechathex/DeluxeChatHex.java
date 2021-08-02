@@ -16,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Collections;
+
 public final class DeluxeChatHex extends JavaPlugin implements Listener {
 
     /**
@@ -50,8 +52,6 @@ public final class DeluxeChatHex extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onDeluxeChatEvent(DeluxeChatEvent event) {
-        event.setCancelled(true);
-
         // get deluxe format
         DeluxeFormat format = event.getDeluxeFormat();
         // convert to 'ChatFormat'
@@ -65,5 +65,7 @@ public final class DeluxeChatHex extends JavaPlugin implements Listener {
                 .anyMatch(p -> p.getUniqueId().equals(((Player) c).getUniqueId())))
                 .sendMessage(component);
 
+        // clear recipients list to prevent unwanted messages in chat that aren't ours
+        event.setRecipients(Collections.emptySet());
     }
 }
