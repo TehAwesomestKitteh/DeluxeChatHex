@@ -35,13 +35,8 @@ dependencies {
     compileOnly 'me.clip:deluxechat:1.14.4'
 
     // adventure
-    slim("net.kyori:adventure-api:4.9.1") {
-        exclude group: 'net.kyori', module: 'adventure-bom'
-    }
-    slim("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT") {
-        exclude group: 'net.kyori', module: 'adventure-bom'
-    }
-
+    implementation 'net.kyori:adventure-api:4.9.1'
+    implementation 'net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT'
     implementation 'org.bstats:bstats-bukkit:2.2.1'
 }
 
