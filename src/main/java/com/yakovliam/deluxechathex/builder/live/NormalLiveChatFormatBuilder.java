@@ -121,7 +121,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder implement
         List<Component> finalComponentBuilder = mergeComponentListStyling(componentBuilder);
 
         // return built component builder
-        return LinearComponents.linear(finalComponentBuilder.toArray(Component[]::new));
+        return LinearComponents.linear(finalComponentBuilder.toArray(new Component[0]));
     }
 
     /**

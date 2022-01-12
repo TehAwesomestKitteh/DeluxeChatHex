@@ -4,6 +4,7 @@ import com.yakovliam.deluxechathex.builder.live.NormalLiveChatFormatBuilder;
 import com.yakovliam.deluxechathex.converter.deluxeformat.DeluxeFormatConverter;
 import com.yakovliam.deluxechathex.model.formatting.ChatFormat;
 import com.yakovliam.deluxechathex.util.Triple;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.deluxechat.events.DeluxeChatEvent;
 import me.clip.deluxechat.objects.DeluxeFormat;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
@@ -46,8 +46,8 @@ public final class DeluxeChatHex extends JavaPlugin implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-        event.getRecipients().clear();
+    public void onAsyncPlayerChatEvent(AsyncChatEvent event) {
+        event.viewers().clear();
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
