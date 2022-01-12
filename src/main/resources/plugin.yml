@@ -7,3 +7,4 @@ description: DeluxeChat Hex Color Plugin
 website: https://www.yakovliam.com/
 depend:
   - DeluxeChat
+softdepend: [DeluxeTags]
